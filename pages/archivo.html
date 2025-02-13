@@ -60,6 +60,8 @@
                             <th>Teléfono</th>
                             <th>Profesión</th>
                             <th>PDF</th>
+                            <th>Editar</th>
+                            <th>Eliminar</th>
                         </tr>
                     </thead>
                     <tbody id="tablaDatos">
@@ -69,6 +71,46 @@
             </div>
         </div>
     </main>
+    <div class="modal fade" id="editDatModal" tabindex="-1" aria-labelledby="editDatModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="editProLabel">Editar Dato</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="editDatForm">
+                    <div class="mb-3">
+                      <label for="editNomb" class="form-label">Nombre</label>
+                      <input type="text" class="form-control" id="editNomb">
+                    </div>
+                    <div class="mb-3">
+                      <label for="editDirec" class="form-label">Dirreccion</label>
+                      <input type="text" class="form-control" id="editDirec">
+                    </div>
+                    <div class="mb-3">
+                      <label for="editEmail" class="form-label">Email</label>
+                      <input type="text" class="form-control" id="editEmail">
+                    </div>
+                    <div class="mb-3">
+                      <label for="editTel" class="form-label">Telefono</label>
+                      <input type="text" class="form-control" id="editTel">
+                    </div>
+                    <div class="mb-3">
+                      <label for="editPro" class="form-label">Profesion</label>
+                      <input type="text" class="form-control" id="editPro">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPdf" class="form-label">Cargar nuevo PDF</label>
+                        <input type="file" class="form-control" id="editPdf" accept="application/pdf">
+                    </div>  
+                    <input type="hidden" id="editDatId">                  
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
 
     <script src="../js/archivo.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
