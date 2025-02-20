@@ -50,6 +50,16 @@
             </button>
             <h2 id="nombreCarpeta" class="mb-3 text-center"></h2>
             <div class="table-responsive">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 id="nombreCarpeta" class="mb-0 text-center flex-grow-1">Detalles de Carpeta</h2>
+                    <div class="d-flex">
+                        <input type="text" id="buscador" class="form-control me-2" placeholder="Buscar por nombre">
+                        <button class="btn btn-primary" onclick="buscarDatos()">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                        <div id="loadingIndicator" style="display: none;">Cargando...</div>
+                    </div>
+                </div>
                 <table class="table table-hover table-striped table-bordered">
                     <thead class="table-dark">
                         <tr>
@@ -68,7 +78,8 @@
                         <!-- Aquí se agregarán los datos dinámicamente -->
                     </tbody>
                 </table>
-            </div>
+                <div id="mensajeError" class="alert alert-danger mt-2" style="display: none;"></div>
+            </div>            
         </div>
     </main>
     <div class="modal fade" id="editDatModal" tabindex="-1" aria-labelledby="editDatModal" aria-hidden="true">

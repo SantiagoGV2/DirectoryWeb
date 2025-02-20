@@ -190,3 +190,97 @@ document.getElementById('editDatForm').addEventListener('submit', async (event) 
       alert('Error al actualizar el dato.');
   }
 });
+
+
+function buscarDatos() {
+    let nombre = document.getElementById("buscador").value.trim();
+    let tablaDatos = document.getElementById("tablaDatos");
+    let mensajeError = document.getElementById("mensajeError");
+    let loadingIndicator = document.getElementById("loadingIndicator");
+
+    if (nombre === "") {
+        mensajeError.innerHTML = "Por favor, ingrese un nombre para buscar.";
+        mensajeError.style.display = "block";
+        return;
+    }
+
+    mensajeError.style.display = "none"; // Ocultar mensajes previos
+    loadingIndicator.style.display = "block"; // Mostrar indicador de carga
+
+    fetch(`http://localhost:8080/api/datoN/${nombre}`)
+        .then(response => {
+            loadingIndicator.style.display = "none"; // Ocultar indicador de carga
+            
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error("No se encontraron resultados.");
+                }
+                throw new Error("Error al obtener datos.");
+            }
+            
+            return response.text(); // Convertir la respuesta a texto primero
+        })
+        .then(text => {
+            if (!text) {
+                throw new Error("No se encontraron resultados.");
+            }
+            
+            return JSON.parse(text); // Convertir a JSON solo si hay contenido
+        })
+        .then(datos => {
+            tablaDatos.innerHTML = ""; // Limpiar la tabla antes de insertar nuevos datos
+
+            if (datos.length === 0) {
+                tablaDatos.innerHTML = `<tr><td colspan="9" class="text-center">No se encontraron resultados</td></tr>`;
+                return;
+            }
+
+            datos.forEach(dato => {
+                let fila = document.createElement("tr");
+                const cod = document.getElementById("nombreCarpeta").getAttribute("data-carId"); // Obtener el ID de la carpeta actual
+                let pdfLink = dato.datId
+                    ? `<a href="http://localhost:8080/api/carpeta/pdf/${cod}/${dato.datId}" class="btn btn-primary btn-sm" download>Descargar PDF</a>`
+                    : "No disponible";
+
+                fila.innerHTML = `
+                    <td>${dato.datId}</td>
+                    <td>${dato.datNombre}</td>
+                    <td>${dato.datDireccion}</td>
+                    <td>${dato.datEmail}</td>
+                    <td>${dato.datTelefono}</td>
+                    <td>${dato.datProfesion}</td>
+                    <td>${pdfLink}</td>
+                    <td>
+                        <button class="btn btn-warning btn-edit" data-id="${dato.datId}">Editar</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-delete" data-id="${dato.datId}">Eliminar</button>
+                    </td>
+                `;
+
+                tablaDatos.appendChild(fila);
+            });
+
+            // Agregar eventos después de generar la tabla
+            document.querySelectorAll('.btn-edit').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const id = event.target.getAttribute('data-id');
+                    editarDato(id);
+                });
+            });
+
+            document.querySelectorAll('.btn-delete').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const id = event.target.getAttribute('data-id');
+                    eliminarDato(id);
+                });
+            });
+
+        })
+        .catch(error => {
+            console.error("Error al buscar datos:", error);
+            mensajeError.innerHTML = error.message;
+            mensajeError.style.display = "block";
+            tablaDatos.innerHTML = `<tr><td colspan="9" class="text-center">No se encontraron resultados</td></tr>`;
+        });
+}
