@@ -30,6 +30,12 @@ function cargarCarpetas() {
         .catch(error => console.error("Error al cargar carpetas:", error));
 }
 
+function previsualizarPdf(id) {
+    const url = `http://localhost:8080/api/dato/preview/${encodeURIComponent(id)}`;
+    window.open(url, '_blank');
+}
+
+
 function mostrarCarpeta(cod) {
   fetch(`http://localhost:8080/api/carpeta/${cod}`)
       .then(response => {
@@ -48,6 +54,11 @@ function mostrarCarpeta(cod) {
 
           (data.datos ?? []).forEach(dato => {
               let fila = document.createElement("tr");
+              let pdfPreview = dato.datId
+                    ? `<button class="btn btn-info btn-sm" onclick="previsualizarPdf(${dato.datId})">
+                          <i class="bi bi-eye"></i>
+                       </button>`
+                    : "No disponible";
               let pdfLink = dato.datId
                   ? `<a href="http://localhost:8080/api/carpeta/pdf/${cod}/${dato.datId}" class="btn btn-primary btn-sm" download>Descargar PDF</a>`
                   : "No disponible";            
@@ -58,7 +69,7 @@ function mostrarCarpeta(cod) {
                   <td>${dato.datEmail}</td>
                   <td>${dato.datTelefono}</td>
                   <td>${dato.datProfesion}</td>
-                  <td>${pdfLink}</td>
+                  <td>${pdfPreview} ${pdfLink}</td>
                   <td>
                       <button class="btn btn-warning btn-edit" data-id="${dato.datId}">Editar</button>
                   </td>
