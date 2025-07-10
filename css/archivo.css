@@ -1,81 +1,149 @@
-/* Fondo general */
+/* Fuente moderna */
 body {
     background-color: #f4f6f9;
-    color: #2d3436;
+    color: #1A2A44;
+    font-family: 'Inter', 'Roboto', 'Montserrat', Arial, sans-serif;
 }
 
 /* Navbar */
 .navbar {
-    background-color: #2c3e50 !important;
+    background-color: #1A2A44 !important;
+    box-shadow: 0 2px 8px rgba(26,42,68,0.08);
 }
 
 .navbar .navbar-brand,
 .navbar .nav-link,
 .navbar .btn {
-    color: #ecf0f1 !important;
+    color: #fff !important;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.navbar .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .navbar .nav-link.active {
     font-weight: bold;
-    color: #1abc9c !important;
+    color: #2563EB !important;
 }
 
 /* Sidebar */
 .sidebar {
-    background-color: #2c3e50;
+    background-color: #1A2A44;
     min-height: 100vh;
+    box-shadow: 2px 0 8px rgba(26,42,68,0.06);
+    padding-top: 2rem;
+}
+
+.sidebar .sidebar-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.sidebar .sidebar-logo img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #2563EB;
+    object-fit: contain;
+}
+
+.sidebar .sidebar-logo span {
+    color: #fff;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-left: 10px;
 }
 
 .sidebar .nav-link {
-    color: #ecf0f1;
-    transition: background-color 0.3s;
+    color: #fff;
+    font-size: 1.08rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    transition: background 0.2s, color 0.2s;
 }
 
 .sidebar .nav-link:hover {
-    background-color: #34495e;
-    color: #1abc9c;
+    background-color: #2563EB;
+    color: #fff;
 }
 
 .sidebar .nav-link.active {
-    background-color: #1abc9c;
-    color: white;
+    background-color: #2563EB;
+    color: #fff;
+    font-weight: bold;
 }
 
 /* Cards */
 .card.bg-primary,
 .card.bg-success,
 .card.bg-info {
-    background-color: white !important;
-    color: #2d3436 !important;
-    border-left: 5px solid #3498db;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: #fff !important;
+    color: #1A2A44 !important;
+    border-left: 6px solid #2563EB;
+    box-shadow: 0 4px 16px rgba(26,42,68,0.08);
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
 }
 
 .card h5 {
-    color: #34495e;
+    color: #2563EB;
+    font-weight: 600;
+}
+
+.card .display-6 {
+    color: #1A2A44;
+    font-weight: bold;
+}
+
+.card i {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    font-size: 2.5rem;
+    color: #2563EB;
+    opacity: 0.15;
 }
 
 /* Botones */
 .btn-primary {
-    background-color: #3498db;
+    background-color: #2563EB;
     border: none;
+    font-weight: 500;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(26,42,68,0.08);
 }
 
 .btn-primary:hover {
-    background-color: #2980b9;
+    background-color: #60A5FA;
+    color: #1A2A44;
 }
 
 .btn-outline-light {
-    border-color: #ecf0f1;
-    color: #ecf0f1;
+    border-color: #fff;
+    color: #fff;
 }
 
 /* Tabla */
 .table thead {
-    background-color: #2c3e50;
-    color: white;
+    background-color: #1A2A44;
+    color: #fff;
 }
 
 .table tbody tr:hover {
     background-color: #e8f4fc;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f4f8ff;
+}
+
+/* Sombra general para tarjetas y botones */
+.shadow-sm {
+    box-shadow: 0 2px 8px rgba(26,42,68,0.08) !important;
 }
