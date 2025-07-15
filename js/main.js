@@ -54,28 +54,49 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Función para eliminar datos
 const eliminarPersonal = async (id) => {
-  const confirmacion = confirm("¿Estás seguro de que deseas eliminar esta persona?");
-  if (confirmacion) {
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: 'Esta acción no se puede deshacer.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
       try {
-          const response = await fetch(
-              `http://localhost:8080/api/datoE/${id}`,
-              {
-                  method: "DELETE",
-              }
-          );
-
-          if (response.ok) {
-              alert("Persona eliminada correctamente");
-              // Recargar la tabla después de eliminar
-              setTimeout(() => fetchPersonal(), 500);  // Espera 500ms antes de recargar
-          } else {
-              const errorText = await response.text();
-              console.error("Error al eliminar la persona:", errorText);
-              alert("Error al eliminar la persona.");
+        const response = await fetch(
+          `http://localhost:8080/api/datoE/${id}`,
+          {
+            method: "DELETE",
           }
+        );
+
+        if (response.ok) {
+          Swal.fire(
+            'Eliminado',
+            'Persona eliminada correctamente.',
+            'success'
+          );
+          setTimeout(() => fetchPersonal(), 500);
+        } else {
+          const errorText = await response.text();
+          console.error("Error al eliminar la persona:", errorText);
+          Swal.fire(
+            'Error',
+            'Error al eliminar la persona.',
+            'error'
+          );
+        }
       } catch (error) {
-          console.error("Error en la conexión al eliminar:", error);
-          alert("Error al eliminar la persona.");
+        console.error("Error en la conexión al eliminar:", error);
+        Swal.fire(
+          'Error',
+          'Error al eliminar la persona.',
+          'error'
+        );
       }
-  }
+    }
+  });
 };

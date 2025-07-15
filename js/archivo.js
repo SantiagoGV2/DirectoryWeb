@@ -45,14 +45,15 @@ function mostrarCarpeta(cod) {
       .then(data => {
           const nombreCarpeta = document.getElementById("nombreCarpeta");
           nombreCarpeta.textContent = `📂 ${data.carNombre}`;
-          
-          // Guardar el ID de la carpeta en data-carId
           nombreCarpeta.setAttribute("data-carId", cod);
 
           let tbody = document.getElementById("tablaDatos");
           tbody.innerHTML = "";
 
-          (data.datos ?? []).forEach(dato => {
+          // Guardar los datos en la variable global
+          datosCarpetaActual = data.datos ?? [];
+
+          datosCarpetaActual.forEach(dato => {
               let fila = document.createElement("tr");
               let pdfPreview = dato.datId
                     ? `<button class="btn btn-info btn-sm" onclick="previsualizarPdf(${dato.datId})">
@@ -87,7 +88,6 @@ function mostrarCarpeta(cod) {
               });
           });
 
-          // Agregar evento a los botones de eliminar
           document.querySelectorAll('.btn-delete').forEach(button => {
               button.addEventListener('click', (event) => {
                   const id = event.target.getAttribute('data-id');
@@ -111,27 +111,49 @@ function volverALista() {
 
 
 const eliminarDato = async (id) => {
-  const confirmacion = confirm('¿Estás seguro de que deseas eliminar este dato?');
-  if (confirmacion) {
-    try {
-      const response = await fetch(`http://localhost:8080/api/datoE/${id}`, {
-        method: 'DELETE',
-      });
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: 'Esta acción no se puede deshacer.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`http://localhost:8080/api/datoE/${id}`, {
+          method: 'DELETE',
+        });
 
-      if (response.ok) {
-        alert('Dato eliminado correctamente');
-        // Obtener el ID de la carpeta actual antes de recargar los datos
-        const cod = document.getElementById("nombreCarpeta").getAttribute("data-carId");
-        mostrarCarpeta(cod); 
-      } else {
-        console.error('Error al eliminar el dato:', await response.text());
-        alert('Error al eliminar el dato.');
+        if (response.ok) {
+          Swal.fire(
+            'Eliminado',
+            'Dato eliminado correctamente.',
+            'success'
+          );
+          // Obtener el ID de la carpeta actual antes de recargar los datos
+          const cod = document.getElementById("nombreCarpeta").getAttribute("data-carId");
+          mostrarCarpeta(cod); 
+        } else {
+          console.error('Error al eliminar el dato:', await response.text());
+          Swal.fire(
+            'Error',
+            'Error al eliminar el dato.',
+            'error'
+          );
+        }
+      } catch (error) {
+        console.error('Error en la conexión al eliminar:', error);
+        Swal.fire(
+          'Error',
+          'Error al eliminar el dato.',
+          'error'
+        );
       }
-    } catch (error) {
-      console.error('Error en la conexión al eliminar:', error);
-      alert('Error al eliminar el dato.');
     }
-  }
+  });
 };
 
 
@@ -185,7 +207,11 @@ document.getElementById('editDatForm').addEventListener('submit', async (event) 
       });
 
       if (response.ok) {
-          alert('Dato actualizado correctamente');
+          Swal.fire(
+            'Actualizado',
+            'Dato actualizado correctamente.',
+            'success'
+          );
           let editModal = bootstrap.Modal.getInstance(document.getElementById('editDatModal'));
           editModal.hide();
 
@@ -194,104 +220,85 @@ document.getElementById('editDatForm').addEventListener('submit', async (event) 
           mostrarCarpeta(cod);
       } else {
           console.error('Error al actualizar el dato:', await response.text());
-          alert('Error al actualizar el dato.');
+          Swal.fire(
+            'Error',
+            'Error al actualizar el dato.',
+            'error'
+          );
       }
   } catch (error) {
       console.error('Error en la conexión al actualizar:', error);
-      alert('Error al actualizar el dato.');
+      Swal.fire(
+        'Error',
+        'Error al actualizar el dato.',
+        'error'
+      );
   }
 });
 
 
-function buscarDatos() {
-    let nombre = document.getElementById("buscador").value.trim();
+// Variable global para guardar los datos de la carpeta actual
+let datosCarpetaActual = [];
+// Nueva función para renderizar la tabla filtrada
+function renderizarTablaFiltrada(datos) {
     let tablaDatos = document.getElementById("tablaDatos");
-    let mensajeError = document.getElementById("mensajeError");
-    let loadingIndicator = document.getElementById("loadingIndicator");
-
-    if (nombre === "") {
-        mensajeError.innerHTML = "Por favor, ingrese un nombre para buscar.";
-        mensajeError.style.display = "block";
+    tablaDatos.innerHTML = "";
+    if (datos.length === 0) {
+        tablaDatos.innerHTML = `<tr><td colspan="9" class="text-center">No se encontraron resultados</td></tr>`;
         return;
     }
-
-    mensajeError.style.display = "none"; // Ocultar mensajes previos
-    loadingIndicator.style.display = "block"; // Mostrar indicador de carga
-
-    fetch(`http://localhost:8080/api/datoN/${nombre}`)
-        .then(response => {
-            loadingIndicator.style.display = "none"; // Ocultar indicador de carga
-            
-            if (!response.ok) {
-                if (response.status === 404) {
-                    throw new Error("No se encontraron resultados.");
-                }
-                throw new Error("Error al obtener datos.");
-            }
-            
-            return response.text(); // Convertir la respuesta a texto primero
-        })
-        .then(text => {
-            if (!text) {
-                throw new Error("No se encontraron resultados.");
-            }
-            
-            return JSON.parse(text); // Convertir a JSON solo si hay contenido
-        })
-        .then(datos => {
-            tablaDatos.innerHTML = ""; // Limpiar la tabla antes de insertar nuevos datos
-
-            if (datos.length === 0) {
-                tablaDatos.innerHTML = `<tr><td colspan="9" class="text-center">No se encontraron resultados</td></tr>`;
-                return;
-            }
-
-            datos.forEach(dato => {
-                let fila = document.createElement("tr");
-                const cod = document.getElementById("nombreCarpeta").getAttribute("data-carId"); // Obtener el ID de la carpeta actual
-                let pdfLink = dato.datId
-                    ? `<a href="http://localhost:8080/api/carpeta/pdf/${cod}/${dato.datId}" class="btn btn-primary btn-sm" download>Descargar PDF</a>`
-                    : "No disponible";
-
-                fila.innerHTML = `
-                    <td>${dato.datId}</td>
-                    <td>${dato.datNombre}</td>
-                    <td>${dato.datDireccion}</td>
-                    <td>${dato.datEmail}</td>
-                    <td>${dato.datTelefono}</td>
-                    <td>${dato.datProfesion}</td>
-                    <td>${pdfLink}</td>
-                    <td>
-                        <button class="btn btn-warning btn-edit" data-id="${dato.datId}">Editar</button>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger btn-delete" data-id="${dato.datId}">Eliminar</button>
-                    </td>
-                `;
-
-                tablaDatos.appendChild(fila);
-            });
-
-            // Agregar eventos después de generar la tabla
-            document.querySelectorAll('.btn-edit').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const id = event.target.getAttribute('data-id');
-                    editarDato(id);
-                });
-            });
-
-            document.querySelectorAll('.btn-delete').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const id = event.target.getAttribute('data-id');
-                    eliminarDato(id);
-                });
-            });
-
-        })
-        .catch(error => {
-            console.error("Error al buscar datos:", error);
-            mensajeError.innerHTML = error.message;
-            mensajeError.style.display = "block";
-            tablaDatos.innerHTML = `<tr><td colspan="9" class="text-center">No se encontraron resultados</td></tr>`;
+    const cod = document.getElementById("nombreCarpeta").getAttribute("data-carId");
+    datos.forEach(dato => {
+        let fila = document.createElement("tr");
+        let pdfLink = dato.datId
+            ? `<a href="http://localhost:8080/api/carpeta/pdf/${cod}/${dato.datId}" class="btn btn-primary btn-sm" download>Descargar PDF</a>`
+            : "No disponible";
+        fila.innerHTML = `
+            <td>${dato.datId}</td>
+            <td>${dato.datNombre}</td>
+            <td>${dato.datDireccion}</td>
+            <td>${dato.datEmail}</td>
+            <td>${dato.datTelefono}</td>
+            <td>${dato.datProfesion}</td>
+            <td>${pdfLink}</td>
+            <td>
+                <button class="btn btn-warning btn-edit" data-id="${dato.datId}">Editar</button>
+            </td>
+            <td>
+                <button class="btn btn-danger btn-delete" data-id="${dato.datId}">Eliminar</button>
+            </td>
+        `;
+        tablaDatos.appendChild(fila);
+    });
+    document.querySelectorAll('.btn-edit').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const id = event.target.getAttribute('data-id');
+            editarDato(id);
         });
+    });
+    document.querySelectorAll('.btn-delete').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const id = event.target.getAttribute('data-id');
+            eliminarDato(id);
+        });
+    });
+}
+
+// Modifica la función buscarDatos para filtrar en el frontend
+function buscarDatos() {
+    let nombre = document.getElementById("buscador").value.trim().toLowerCase();
+    let mensajeError = document.getElementById("mensajeError");
+    mensajeError.style.display = "none";
+    if (nombre === "") {
+        renderizarTablaFiltrada(datosCarpetaActual);
+        return;
+    }
+    const filtrados = datosCarpetaActual.filter(dato =>
+        dato.datNombre && dato.datNombre.toLowerCase().includes(nombre)
+    );
+    renderizarTablaFiltrada(filtrados);
+    if (filtrados.length === 0) {
+        mensajeError.innerHTML = "No se encontraron resultados.";
+        mensajeError.style.display = "block";
+    }
 }
